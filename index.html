@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>บันทึกข้อความ ขออนุมัติไปราชการ - สำนักงานเกษตรอำเภอสีดา</title>
+  <link rel="stylesheet" href="assets/fonts.css">
+  <style>
+    :root {
+      --ui-bg: #eef1f5;
+      --ui-panel: #ffffff;
+      --ui-border: #d0d7de;
+      --ui-primary: #1b5e20;
+      --ui-primary-hover: #144718;
+      --ui-accent: #0d6efd;
+      --edit-bg: rgba(13, 110, 253, 0.08);
+      --edit-border: rgba(13, 110, 253, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--ui-bg);
+      color: #111;
+      font-family: 'THSarabunIT9Exact', 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    /* ===== Toolbar (Hidden on Print) ===== */
+    .toolbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 54px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--ui-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 1000;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      font-size: 13px;
+      gap: 10px;
+    }
+
+    .toolbar-left, .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: #1b5e20;
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--ui-border);
+      background: #fff;
+      color: #24292f;
+      border-radius: 6px;
+      padding: 6px 11px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.15s, border-color 0.15s;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: #f6f8fa;
+      border-color: #adb5bd;
+    }
+
+    .btn.active {
+      background: #e8f5e9;
+      border-color: #2e7d32;
+      color: #1b5e20;
+    }
+
+    .btn-primary {
+      background: var(--ui-primary);
+      border-color: var(--ui-primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--ui-primary-hover);
+      border-color: var(--ui-primary-hover);
+    }
+
+    .overlay-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f6f8fa;
+      border: 1px solid var(--ui-border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+
+    .overlay-control input[type="range"] {
+      width: 85px;
+      cursor: pointer;
+    }
+
+    /* ===== Workspace Layout ===== */
+    .workspace {
+      padding-top: 70px;
+      padding-bottom: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+      min-height: 100vh;
+    }
+
+    /* ===== Sidebar Form ===== */
+    .sidebar {
+      width: 360px;
+      flex-shrink: 0;
+      background: #fff;
+      border: 1px solid var(--ui-border);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      padding: 14px 16px;
+      position: sticky;
+      top: 68px;
+      max-height: calc(100vh - 84px);
+      overflow-y: auto;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      font-size: 12.5px;
+    }
+
+    .sidebar.hidden {
+      display: none;
+    }
+
+    .sidebar h2 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      color: #1b5e20;
+      border-bottom: 1px solid #e9ecef;
+      padding-bottom: 8px;
+    }
+
+    .form-section {
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #e5e7eb;
+    }
+
+    .form-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .form-section-title {
+      font-weight: 700;
+      font-size: 12px;
+      color: #495057;
+      margin-bottom: 8px;
+    }
+
+    .field-group {
+      margin-bottom: 8px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .field-group label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 3px;
+    }
+
+    .field-group input[type="text"],
+    .field-group textarea,
+    .field-group select {
+      width: 100%;
+      padding: 5px 8px;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      font-size: 12.5px;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      color: #212529;
+      background: #fff;
+    }
+
+    .field-group textarea {
+      resize: vertical;
+      min-height: 76px;
+      line-height: 1.4;
+    }
+
+    .field-group input:focus,
+    .field-group textarea:focus {
+      outline: none;
+      border-color: #2e7d32;
+      box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.15);
+    }
+
+    .radio-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* ===== A4 Paper (Exact PDF Dimensions: 595.2pt x 841.92pt = 210mm x 297mm) ===== */
+    .paper-stage {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+
+    .a4-page {
+      width: 595.2pt;
+      height: 841.92pt;
+      background: #ffffff;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+      font-family: 'THSarabunIT9Exact', sans-serif;
+      font-size: 16.08pt;
+      line-height: 18.12pt;
+      color: #000000;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      font-kerning: normal;
+      font-variant-ligatures: common-ligatures;
+    }
+
+    .ref-overlay {
+      position: absolute;
+      inset: 0;
+      width: 595.2pt;
+      height: 841.92pt;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 50;
+    }
+
+    /* ===== Editable Styling ===== */
+    [contenteditable="true"] {
+      outline: none;
+      border-radius: 2px;
+      transition: background 0.12s;
+    }
+
+    body.show-highlights [contenteditable="true"] {
+      background: var(--edit-bg);
+      box-shadow: inset 0 0 0 0.5pt var(--edit-border);
+    }
+
+    [contenteditable="true"]:hover,
+    [contenteditable="true"]:focus {
+      background: rgba(13, 110, 253, 0.12);
+      box-shadow: inset 0 0 0 0.75pt rgba(13, 110, 253, 0.55);
+    }
+
+    /* ===== Exact Header Elements ===== */
+    .garuda {
+      position: absolute;
+      left: 83.40pt;
+      top: 32.50pt;
+      width: 46.33pt;
+      height: 48.23pt;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* THSarabunIT9: top of em/line-box to baseline = 0.85 * font-size */
+    .doc-title {
+      position: absolute;
+      left: 257.62pt;
+      top: 55.11pt;
+      font-size: 29.04pt;
+      font-weight: 700;
+      line-height: 1.1;
+      white-space: pre;
+    }
+
+    .header-line-1 {
+      position: absolute;
+      left: 84.98pt;
+      top: 87.45pt;
+      white-space: nowrap;
+      line-height: 1.1;
+    }
+
+    .lbl-1992 {
+      font-size: 19.92pt;
+      font-weight: 700;
+    }
+
+    .lbl-1800 {
+      font-size: 18.00pt;
+      font-weight: 700;
+    }
+
+    .val-dept {
+      display: inline-block;
+      margin-left: 7.21pt;
+      font-size: 16.08pt;
+      font-weight: 400;
+      min-width: 120pt;
+    }
+
+    .header-line-2 {
+      position: absolute;
+      left: 84.98pt;
+      top: 110.23pt;
+      width: 455pt;
+      line-height: 1.1;
+    }
+
+    .val-docno {
+      display: inline-block;
+      margin-left: 9.06pt;
+      font-size: 16.08pt;
+      font-weight: 400;
+      min-width: 60pt;
+    }
+
+    .date-wrap {
+      position: absolute;
+      left: 226.90pt; /* 311.88 - 84.98 */
+      top: 1.45pt;    /* baseline alignment: 18pt vs 19.92pt */
+      white-space: nowrap;
+    }
+
+    .val-date {
+      display: inline-block;
+      margin-left: 3.5pt;
+      font-size: 16.08pt;
+      font-weight: 400;
+      min-width: 80pt;
+    }
+
+    .header-line-3 {
+      position: absolute;
+      left: 84.98pt;
+      top: 132.65pt;
+      white-space: nowrap;
+      line-height: 1.1;
+    }
+
+    .val-subject {
+      display: inline-block;
+      margin-left: 6.19pt;
+      font-size: 16.08pt;
+      font-weight: 400;
+      min-width: 80pt;
+    }
+
+    .salutation-line {
+      position: absolute;
+      left: 84.98pt;
+      top: 160.43pt;
+      font-size: 16.08pt;
+      line-height: 17.69pt;
+      white-space: nowrap;
+    }
+
+    .salutation-gap {
+      display: inline-block;
+      width: 10.08pt; /* 3 spaces in PDF: 106.37..116.45 */
+    }
+
+    /* ===== Main Flow Area (Starts at exact baseline y=198.05pt) ===== */
+    .flow-content {
+      position: absolute;
+      left: 84.98pt;
+      top: 184.43pt; /* 198.05 - 13.67 (0.85 * 16.08) */
+      width: 454.36pt; /* 539.34 - 84.98 */
+      font-size: 16.08pt;
+      line-height: 18.106pt;
+    }
+
+    .main-para {
+      margin: 0;
+      text-indent: 70.85pt; /* 155.83 - 84.98 */
+      text-align: justify;
+      text-justify: inter-word;
+      word-wrap: break-word;
+      line-height: 18.106pt;
+    }
+
+    .comma-sm {
+      font-size: 7.92pt;
+      line-height: 0;
+    }
+
+    .condensed {
+      letter-spacing: -0.68pt;
+    }
+
+    .intro-use-line {
+      margin: 0;
+      text-indent: 0;
+      line-height: 18.02pt;
+    }
+
+    .intro-use-line.is-empty {
+      height: 6pt;
+      min-height: 6pt;
+      line-height: 6pt;
+      overflow: hidden;
+    }
+
+    .intro-use-line.is-empty:focus {
+      height: auto;
+      min-height: 18.02pt;
+      line-height: 18.02pt;
+      overflow: visible;
+    }
+
+    /* ===== Vehicle Checkboxes & Options ===== */
+    .vehicle-block {
+      margin-top: 0pt;
+    }
+
+    .opt-row {
+      position: relative;
+      padding-left: 72.05pt; /* 157.03 - 84.98 */
+      line-height: 18.10pt;
+      min-height: 18.10pt;
+      display: flex;
+      align-items: baseline;
+      white-space: nowrap;
+    }
+
+    .opt-row-wrap {
+      padding-left: 0;
+      line-height: 18.10pt;
+      min-height: 18.10pt;
+      white-space: nowrap;
+    }
+
+    .chk-btn {
+      position: absolute;
+      left: 72.05pt; /* 157.03 - 84.98 */
+      top: 1.95pt;
+      width: 14.33pt;
+      height: 14.33pt;
+      padding: 0;
+      margin: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chk-btn svg {
+      width: 14.33pt;
+      height: 14.33pt;
+      overflow: visible;
+      display: block;
+    }
+
+    .opt-text {
+      margin-left: 19.20pt; /* 176.23 - 157.03 */
+      display: inline-flex;
+      align-items: baseline;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .opt-text-4 {
+      margin-left: 19.68pt; /* 176.71 - 157.03 */
+    }
+
+    /* ===== Dotted / Dashed Fill Fields ===== */
+    .dot-fill {
+      display: inline-block;
+      position: relative;
+      min-height: 15pt;
+      vertical-align: baseline;
+      text-align: center;
+      padding: 0 2pt;
+      line-height: 1.05;
+      letter-spacing: 0pt;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .dot-fill.align-left {
+      text-align: left;
+    }
+
+    /* Classic period dots rendered as real crisp font dots when empty */
+    .dot-fill.style-dots:empty::before {
+      content: attr(data-dots);
+      color: #000;
+      pointer-events: none;
+      letter-spacing: var(--dot-ls, 0pt);
+    }
+
+    .dot-fill.style-dots:not(:empty) {
+      border-bottom: 0.45pt dotted #444;
+      padding-bottom: 0.5pt;
+    }
+
+    /* Crisp vector dashed underline matching PDF Word underline drawings */
+    .dot-fill.style-underline {
+      padding: 0;
+      overflow: visible;
+    }
+
+    .dot-fill.style-underline::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 14.1pt;
+      height: 0;
+      background-image: none;
+      border-bottom: 0.45pt dotted #444;
+      pointer-events: none;
+    }
+
+    .expense-line {
+      display: flex;
+      align-items: baseline;
+      line-height: 18.00pt;
+      white-space: nowrap;
+    }
+
+    .delegate-line {
+      display: flex;
+      align-items: baseline;
+      line-height: 18.00pt;
+      white-space: nowrap;
+    }
+
+    .closing-line {
+      margin-top: 6.0pt;
+      padding-left: 72.05pt; /* 157.03 - 84.98 */
+      line-height: 18.00pt;
+    }
+
+    /* ===== Signature Blocks ===== */
+    .sig-applicant {
+      margin-top: 6.1pt;
+      padding-left: 226.90pt; /* 311.88 - 84.98 */
+      line-height: 18.96pt;
+    }
+
+    .sig-line {
+      display: flex;
+      align-items: baseline;
+      white-space: nowrap;
+    }
+
+    .sig-center-right {
+      width: 240pt;
+      margin-left: -35.5pt;
+      text-align: center;
+      line-height: 18.00pt;
+      white-space: nowrap;
+    }
+
+    .sig-supervisor {
+      margin-top: 24.0pt;
+      padding-left: 226.90pt; /* 311.88 - 84.98 */
+      line-height: 18.15pt;
+    }
+
+    .approval-row {
+      position: relative;
+      min-height: 18.00pt;
+      line-height: 18.00pt;
+    }
+
+    .lbl-approve {
+      position: absolute;
+      left: 85.73pt; /* 170.71 - 84.98 */
+      top: 0;
+      font-weight: 700;
+      font-size: 16.08pt;
+    }
+
+    .sup-paren-wrap {
+      width: 240pt;
+      margin-left: 192.22pt; /* center at 397.2pt */
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .sup-name-fill {
+      min-width: 110.69pt;
+    }
+
+    .sup-name-fill:not(:empty) {
+      min-width: 0;
+      width: auto;
+      padding: 0;
+    }
+
+    .sup-name-fill:not(:empty)::after {
+      display: none;
+    }
+
+    .sup-role-line {
+      width: 240pt;
+      margin-left: 192.22pt;
+      text-align: center;
+      line-height: 18.00pt;
+      min-height: 18.00pt;
+      white-space: nowrap;
+    }
+
+    .sig-approver {
+      margin-top: 6.0pt;
+      padding-left: 58.59pt; /* 143.57 - 84.98 */
+      line-height: 18.02pt;
+    }
+
+    .sig-center-left {
+      width: 240pt;
+      margin-left: -26.1pt;
+      text-align: center;
+      line-height: 18.08pt;
+      white-space: nowrap;
+    }
+
+    /* ===== Print Overrides ===== */
+    @page {
+      size: 210mm 297mm;
+      margin: 0;
+    }
+
+    @media print {
+      html, body {
+        width: 210mm;
+        height: 297mm;
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .workspace {
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+      }
+
+      .paper-stage {
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .a4-page {
+        width: 595.2pt !important;
+        height: 841.92pt !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        page-break-after: avoid;
+        break-after: avoid;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .ref-overlay {
+        display: none !important;
+      }
+
+      [contenteditable="true"],
+      body.show-highlights [contenteditable="true"] {
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="show-highlights">
+
+  <!-- Top Toolbar -->
+  <header class="toolbar no-print">
+    <div class="toolbar-left">
+      <span class="toolbar-title">แบบฟอร์มบันทึกข้อความ ขออนุมัติไปราชการ</span>
+      <button type="button" class="btn btn-primary" onclick="window.print()">
+        🖨️ พิมพ์ / บันทึก PDF (A4)
+      </button>
+      <button type="button" class="btn active" id="btnToggleSidebar" onclick="toggleSidebar()">
+        📝 แผงช่วยกรอก
+      </button>
+      <button type="button" class="btn active" id="btnToggleHighlight" onclick="toggleHighlights()">
+        🖍️ ไฮไลต์ช่องแก้ไข
+      </button>
+    </div>
+
+    <div class="toolbar-right">
+      <div class="overlay-control" title="ซ้อนภาพต้นฉบับเพื่อเทียบระยะ">
+        <span>เทียบต้นฉบับ:</span>
+        <input type="range" id="overlayRange" min="0" max="80" value="0" oninput="setOverlayOpacity(this.value)">
+        <span id="overlayPct">0%</span>
+      </div>
+      <button type="button" class="btn" onclick="exportJson()">💾 ส่งออก JSON</button>
+      <button type="button" class="btn" onclick="document.getElementById('importFile').click()">📂 นำเข้า JSON</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJson(event)">
+      <button type="button" class="btn" onclick="resetDefaults()">↺ รีเซ็ตค่าต้นฉบับ</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <!-- Left Helper Sidebar -->
+    <aside class="sidebar no-print" id="sidebar">
+      <h2>กรอกข้อมูลแบบฟอร์ม (ซิงค์กับกระดาษทันที)</h2>
+      <div style="font-size:11.5px; color:#6c757d; margin-bottom:10px;">
+        สามารถแก้ไขได้ทั้งจากช่องด้านล่างนี้ หรือคลิกพิมพ์แก้บนกระดาษ A4 ด้านขวาโดยตรง
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">ส่วนหัวบันทึกข้อความ</div>
+        <div class="field-group">
+          <label>ส่วนราชการ</label>
+          <input type="text" data-bind="dept">
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label>ที่</label>
+            <input type="text" data-bind="docno">
+          </div>
+          <div class="field-group">
+            <label>วันที่</label>
+            <input type="text" data-bind="date">
+          </div>
+        </div>
+        <div class="field-group">
+          <label>เรื่อง</label>
+          <input type="text" data-bind="subject">
+        </div>
+        <div class="field-group">
+          <label>เรียน</label>
+          <input type="text" data-bind="salutation">
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">เนื้อหาการไปราชการ</div>
+        <div class="field-group">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
+            <label style="margin:0;">ข้อความเนื้อหาหลัก (แก้ได้ทั้งหมด)</label>
+            <button type="button" class="btn" style="font-size:11px; padding:2px 7px;" onclick="justifyMainBodyNow()">จัดเต็มบรรทัด</button>
+          </div>
+          <textarea data-bind="mainBody" rows="7"></textarea>
+        </div>
+        <div class="field-group">
+          <label>ข้อความนำก่อนเลือกพาหนะ</label>
+          <input type="text" data-bind="introUse">
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">พาหนะเดินทาง</div>
+        <div class="radio-list">
+          <label class="radio-item"><input type="radio" name="sbVehicle" value="1" onchange="setVehicle(1)"> โดยสารประจำทางปรับอากาศ</label>
+          <label class="radio-item"><input type="radio" name="sbVehicle" value="2" onchange="setVehicle(2)"> รถจักรยานยนต์</label>
+          <label class="radio-item"><input type="radio" name="sbVehicle" value="3" onchange="setVehicle(3)"> รถยนต์ส่วนตัว</label>
+          <label class="radio-item"><input type="radio" name="sbVehicle" value="4" onchange="setVehicle(4)" checked> รถยนต์ของทางราชการ</label>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label>ทะเบียนรถจักรยานยนต์</label>
+            <input type="text" data-bind="motoPlate">
+          </div>
+          <div class="field-group">
+            <label>เนื่องจาก (รถจักรยานยนต์)</label>
+            <input type="text" data-bind="motoReason">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label>ทะเบียนรถยนต์ส่วนตัว</label>
+          <input type="text" data-bind="privatePlate">
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label>ทะเบียนรถราชการ</label>
+            <input type="text" data-bind="govPlate">
+          </div>
+          <div class="field-group">
+            <label>น้ำมันเชื้อเพลิง (ลิตร)</label>
+            <input type="text" data-bind="fuel">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label>พนักงานขับรถยนต์</label>
+          <input type="text" data-bind="driver">
+        </div>
+
+        <div class="field-group">
+          <label>เบิกค่าใช้จ่ายจากงบประมาณโครงการ</label>
+          <input type="text" data-bind="budget">
+        </div>
+
+        <div class="field-group">
+          <label>มอบหมายให้เป็นผู้ปฏิบัติหน้าที่แทน</label>
+          <input type="text" data-bind="delegate">
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">การลงนาม</div>
+        <div class="field-row">
+          <div class="field-group">
+            <label>ผู้ขออนุมัติ (ในวงเล็บ)</label>
+            <input type="text" data-bind="applicantName">
+          </div>
+          <div class="field-group">
+            <label>ตำแหน่งผู้ขออนุมัติ</label>
+            <input type="text" data-bind="applicantRole">
+          </div>
+        </div>
+        <div class="field-row" style="margin-bottom: 6px;">
+          <button type="button" class="btn" style="font-size:11px; padding:4px 6px; justify-content:center;" onclick="applySupervisorPreset(true)">เกษตรอำเภอขอเอง (-)</button>
+          <button type="button" class="btn" style="font-size:11px; padding:4px 6px; justify-content:center;" onclick="applySupervisorPreset(false)">เจ้าหน้าที่ขอ (เกษตรอำเภอเซ็น)</button>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label>ลงชื่อผู้บังคับบัญชาชั้นต้น</label>
+            <input type="text" data-bind="supervisorSign">
+          </div>
+          <div class="field-group">
+            <label>ชื่อผู้บังคับบัญชา (ในวงเล็บ)</label>
+            <input type="text" data-bind="supervisorName">
+          </div>
+        </div>
+        <div class="field-group">
+          <label>ตำแหน่งผู้บังคับบัญชาชั้นต้น</label>
+          <input type="text" data-bind="supervisorRole">
+        </div>
+        <div class="field-group">
+          <label>ข้อความอนุมัติ</label>
+          <input type="text" data-bind="approveWord">
+        </div>
+        <div class="field-group">
+          <label>ผู้อนุมัติ (ในวงเล็บ)</label>
+          <input type="text" data-bind="approverName">
+        </div>
+        <div class="field-group">
+          <label>ตำแหน่งผู้อนุมัติ บรรทัด 1</label>
+          <input type="text" data-bind="approverRole1">
+        </div>
+        <div class="field-group">
+          <label>ตำแหน่งผู้อนุมัติ บรรทัด 2</label>
+          <input type="text" data-bind="approverRole2">
+        </div>
+      </div>
+    </aside>
+
+    <!-- Exact A4 Paper Canvas -->
+    <div class="paper-stage">
+      <div class="a4-page" id="a4Page">
+        <img class="ref-overlay" id="refOverlay" src="assets/reference-overlay.png" alt="">
+        <img class="garuda" src="assets/garuda.png" alt="ตราครุฑ">
+
+        <!-- Title -->
+        <div class="doc-title" contenteditable="true" data-field="docTitle">บันทึกข้อความ</div>
+
+        <!-- Header Line 1: ส่วนราชการ -->
+        <div class="header-line-1">
+          <span class="lbl-1992">ส่วนราชการ</span><span class="val-dept" contenteditable="true" data-field="dept">สำนักงานเกษตรอำเภอสีดา จังหวัดนครราชสีมา 30430 โทร. 093 319 0733</span>
+        </div>
+
+        <!-- Header Line 2: ที่ & วันที่ -->
+        <div class="header-line-2">
+          <span class="lbl-1992">ที่</span><span class="val-docno" contenteditable="true" data-field="docno">นม 3109/427</span>
+          <span class="date-wrap">
+            <span class="lbl-1800">วันที่</span><span class="val-date" contenteditable="true" data-field="date">25 พฤศจิกายน 2569</span>
+          </span>
+        </div>
+
+        <!-- Header Line 3: เรื่อง -->
+        <div class="header-line-3">
+          <span class="lbl-1992">เรื่อง</span><span class="val-subject" contenteditable="true" data-field="subject">ขออนุมัติไปราชการ</span>
+        </div>
+
+        <!-- Salutation: เรียน -->
+        <div class="salutation-line">
+          <span>เรียน</span><span class="salutation-gap"></span><span contenteditable="true" data-field="salutation">ผู้ว่าราชการจังหวัดนครราชสีมา</span>
+        </div>
+
+        <!-- Flowing Body & Signature Area -->
+        <div class="flow-content">
+          <p class="main-para" contenteditable="true" data-field="mainBody"></p>
+
+          <p class="intro-use-line condensed" contenteditable="true" data-field="introUse">ในการไปราชการครั้งนี้ ข้าพเจ้าขออนุมัติใช้</p>
+
+          <!-- Vehicle Options -->
+          <div class="vehicle-block">
+            <!-- Option 1 -->
+            <div class="opt-row condensed">
+              <button type="button" class="chk-btn" data-chk="1" onclick="toggleVehicle(1)" aria-label="โดยสารประจำทางปรับอากาศ"></button>
+              <span class="opt-text">โดยสารประจำทางปรับอากาศ</span>
+            </div>
+
+            <!-- Option 2 -->
+            <div class="opt-row condensed">
+              <button type="button" class="chk-btn" data-chk="2" onclick="toggleVehicle(2)" aria-label="รถจักรยานยนต์"></button>
+              <span class="opt-text">
+                <span>รถจักรยานยนต์ หมายเลขทะเบียน</span>
+                <span class="dot-fill style-dots" style="width: 88.5pt; padding: 0; --dot-ls: 0.45pt;" data-dots="............................................" contenteditable="true" data-field="motoPlate"></span>
+                <span>&nbsp;เนื่องจาก&nbsp;</span>
+                <span class="dot-fill style-dots" style="flex: 1; padding: 0; --dot-ls: 0.08pt;" data-dots="...................................................." contenteditable="true" data-field="motoReason"></span>
+              </span>
+            </div>
+
+            <!-- Option 3 -->
+            <div class="opt-row condensed">
+              <button type="button" class="chk-btn" data-chk="3" onclick="toggleVehicle(3)" aria-label="รถยนต์ส่วนตัว"></button>
+              <span class="opt-text">
+                <span>รถยนต์ส่วนตัว หมายเลขทะเบียน</span>
+                <span class="dot-fill style-underline" style="width: 94.5pt;" contenteditable="true" data-field="privatePlate"></span>
+                <span style="letter-spacing: -0.58pt;">เนื่องจากรถยนต์ราชการมีไม่เพียงพอ</span>
+              </span>
+            </div>
+            <div class="opt-row-wrap condensed">ต่อการไปปฏิบัติราชการในพื้นที่</div>
+
+            <!-- Option 4 -->
+            <div class="opt-row">
+              <button type="button" class="chk-btn" data-chk="4" onclick="toggleVehicle(4)" aria-label="รถยนต์ของทางราชการ"></button>
+              <span class="opt-text opt-text-4">
+                <span class="condensed">รถยนต์ ของทางราชการหมายเลขทะเบียน&nbsp;</span>
+                <span class="dot-fill style-underline" style="width: 106.8pt;" contenteditable="true" data-field="govPlate">งย 5385 นครราชสีมา</span>
+                <span class="condensed">&nbsp;น้ำมันเชื้อเพลิง</span>
+                <span class="dot-fill style-dots" style="width: 24.38pt; padding: 0; --dot-ls: 0.06pt;" data-dots="............" contenteditable="true" data-field="fuel"></span>
+                <span class="condensed">ลิตร</span>
+              </span>
+            </div>
+            <div class="opt-row-wrap" style="letter-spacing: 0.04pt;">
+              <span>โดยมี</span><span contenteditable="true" data-field="driver">นายนพฤทธิ์ น้อยเล็น หรือ นายจักรกฤษณ์ เอี่ยมเอม</span><span> เป็นพนักงานขับรถยนต์ ซึ่งการไปราชการในครั้งนี้</span>
+            </div>
+          </div>
+
+          <!-- Expense & Delegate -->
+          <div class="expense-line">
+            <span class="condensed">เบิกค่าใช้จ่าย จากงบประมาณโครงการ</span>
+            <span class="dot-fill style-dots align-left" style="flex: 1; padding: 0; --dot-ls: 0.07pt;" data-dots="........................................................................................................................................................." contenteditable="true" data-field="budget"></span>
+          </div>
+          <div class="delegate-line" style="padding-right: 2.2pt;">
+            <span class="condensed" style="letter-spacing: -0.73pt;">และระหว่างที่ไปราชการข้าพเจ้าได้มอบหมายให้</span>
+            <span class="dot-fill style-dots" style="flex: 1; padding: 0; --dot-ls: 0.08pt;" data-dots="..........................................................................................." contenteditable="true" data-field="delegate"></span>
+            <span class="condensed" style="letter-spacing: -0.73pt;">เป็นผู้ปฏิบัติหน้าที่แทน</span>
+          </div>
+
+          <!-- Closing -->
+          <div class="closing-line condensed">จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ</div>
+
+          <!-- Applicant Signature (Right) -->
+          <div class="sig-applicant">
+            <div class="sig-line">
+              <span>(ลงชื่อ)</span>
+              <span class="dot-fill style-dots" style="width: 116.62pt; padding: 0; --dot-ls: 0.68pt;" data-dots="............................................."></span>
+              <span>ผู้ขออนุมัติ</span>
+            </div>
+            <div class="sig-center-right" contenteditable="true" data-field="applicantName">(นางอรอนงค์ สูญกลาง)</div>
+            <div class="sig-center-right" contenteditable="true" data-field="applicantRole">เกษตรอำเภอสีดา</div>
+          </div>
+
+          <!-- Supervisor Signature (Right) + อนุมัติ (Left) -->
+          <div class="sig-supervisor">
+            <div class="sig-line">
+              <span>(ลงชื่อ)</span>
+              <span class="dot-fill style-dots" style="width: 116.62pt; padding: 0; --dot-ls: 0.68pt;" data-dots="............................................." contenteditable="true" data-field="supervisorSign">-</span>
+              <span>ผู้บังคับบัญชาชั้นต้น</span>
+            </div>
+          </div>
+
+          <div class="approval-row">
+            <span class="lbl-approve" contenteditable="true" data-field="approveWord">อนุมัติ</span>
+            <div class="sup-paren-wrap">
+              <span>(</span><span class="dot-fill style-underline sup-name-fill" contenteditable="true" data-field="supervisorName"></span><span>)</span>
+            </div>
+          </div>
+          <div class="sup-role-line" contenteditable="true" data-field="supervisorRole"></div>
+
+          <!-- Approver Signature (Bottom Left) -->
+          <div class="sig-approver">
+            <div class="sig-line">
+              <span>ลงชื่อ</span>
+              <span class="dot-fill style-dots" style="width: 147.92pt; padding: 0; --dot-ls: 0.68pt;" data-dots="........................................................."></span>
+              <span>ผู้อนุมัติ</span>
+            </div>
+            <div class="sig-center-left" contenteditable="true" data-field="approverName">(นางสาวสุวรรณา มังคลานนทชัย)</div>
+            <div class="sig-center-left" contenteditable="true" data-field="approverRole1">นายอำเภอสีดา ปฏิบัติราชการแทน</div>
+            <div class="sig-center-left" style="padding-left: 2.5pt;" contenteditable="true" data-field="approverRole2">ผู้ว่าราชการจังหวัดนครราชสีมา</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'sida_travel_memo_v1';
+
+    const DEFAULTS = {
+      docTitle: 'บันทึกข้อความ',
+      dept: 'สำนักงานเกษตรอำเภอสีดา จังหวัดนครราชสีมา 30430 โทร. 093 319 0733',
+      docno: 'นม 3109/427',
+      date: '25 พฤศจิกายน 2569',
+      subject: 'ขออนุมัติไปราชการ',
+      salutation: 'ผู้ว่าราชการจังหวัดนครราชสีมา',
+      mainBodyHTML: [
+        '<span style="letter-spacing:-0.27pt">ข้าพเจ้า นางอรอนงค์ สูญกลาง ตำแหน่ง เกษตรอำเภอสีดา พร้อมด้วย นางสาวหนึ่งนภา ปัจจัยโย</span> ',
+        '<span style="letter-spacing:0pt">ตำแหน่งเจ้าพนักงานธุรการ ขออนุมัติไปราชการที่</span> <span style="letter-spacing:-0.50pt">หมู่ที่ 1-11 ตำบลสีดา หมู่ที่ 1-10 ตำบลโพนทอง หมู่ที่ 1-10</span> ',
+        '<span style="letter-spacing:-0.32pt">ตำบลสามเมือง หมู่ที่ 1-9 ตำบลหนองตาดใหญ่ และ หมู่ที่ 1-10 ตำบลโนนประดู่ เพื่อติดตามและปฏิบัติงานตาม</span> ',
+        '<span style="letter-spacing:0.03pt">ระบบส่งเสริมการเกษตร ดังนี้ งานศบกต., โครงการศูนย์เรียนรู้การเพิ่มประสิทธิภาพการผลิตสินค้าเกษตร,</span> ',
+        '<span style="letter-spacing:-0.26pt">โครงการระบบส่งเสริมการเกษตรแบบแปลงใหญ่เพื่อปรับเพิ่มผลิตภาพการผลิต, โครงการศูนย์จัดการดินปุ๋ยชุมชน,</span> ',
+        '<span style="letter-spacing:-0.47pt">โครงการศูนย์จัดการศัตรูพืชชุมชน, โครงการส่งเสริมการจัดการสุขภาพพืชเพื่อเพิ่มประสิทธิภาพการผลิตสินค้าเกษตร<span class="comma-sm">,</span></span> ',
+        '<span style="letter-spacing:-0.12pt">โครงการรับรองมาตรฐานเกษตรอินทรีย์, งานเกษตรอินทรีย์, โครงการยกระดับคุณภาพมาตรฐานสินค้าเกษตร,</span> ',
+        '<span style="letter-spacing:0.06pt">โครงการปรับเปลี่ยนการผลิตพืชที่เหมาะสมตามแผนที่ Zoning by Agri-Map, โครงการขับเคลื่อนการเกษตร</span> ',
+        '<span style="letter-spacing:0.42pt">ระดับหมู่บ้านสู่การผลิตสินค้าเกษตรมูลค่าสูง, โครงการส่งเสริมการเกษตรที่เป็นมิตรกับสิ่งแวดล้อม,</span> ',
+        '<span style="letter-spacing:-0.25pt">โครงการส่งเสริมและพัฒนาผู้ประกอบการวิสาหกิจชุมชน, โครงการขับเคลื่อนนโยบายพัฒนาเกษตรกรและองค์กร</span> ',
+        '<span style="letter-spacing:0pt">เกษตรกร (3ก), โครงการพัฒนา Smart Farmer และ Young Smart Farmer, </span><span style="letter-spacing:-0.35pt">งานอกม., โครงการขึ้นทะเบียน</span> ',
+        '<span style="letter-spacing:-0.16pt">เกษตรกรและบริหารจัดการสารสนเทศการเกษตรด้านพืช, โครงการพัฒนาด้านการเกษตรงบพัฒนาจังหวัดและ</span> ',
+        '<span style="letter-spacing:-0.14pt">งานโครงการอื่น ๆ ตามที่ได้รับมอบหมาย ในวันที่ 1 ธันวาคม 2569 ถึงวันที่ 30 ธันวาคม 2569 &nbsp;รวม 19 วัน</span>'
+      ].join(''),
+      introUse: 'ในการไปราชการครั้งนี้ ข้าพเจ้าขออนุมัติใช้',
+      vehicleChoice: 4,
+      motoPlate: '',
+      motoReason: '',
+      privatePlate: '',
+      govPlate: 'งย 5385 นครราชสีมา',
+      fuel: '',
+      driver: 'นายนพฤทธิ์ น้อยเล็น หรือ นายจักรกฤษณ์ เอี่ยมเอม',
+      budget: '',
+      delegate: '',
+      applicantName: '(นางอรอนงค์ สูญกลาง)',
+      applicantRole: 'เกษตรอำเภอสีดา',
+      supervisorSign: '-',
+      supervisorName: '',
+      supervisorRole: '',
+      approveWord: 'อนุมัติ',
+      approverName: '(นางสาวสุวรรณา มังคลานนทชัย)',
+      approverRole1: 'นายอำเภอสีดา ปฏิบัติราชการแทน',
+      approverRole2: 'ผู้ว่าราชการจังหวัดนครราชสีมา'
+    };
+
+    let state = { ...DEFAULTS };
+    let lastIsOfficerSelf = true;
+
+    function isDistrictAgriOfficer(name, role) {
+      const n = (name || '').trim();
+      const r = (role || '').trim();
+      return r.includes('เกษตรอำเภอ') || n.includes('อรอนงค์');
+    }
+
+    function applySupervisorPreset(isOfficerSelf) {
+      lastIsOfficerSelf = isOfficerSelf;
+      if (isOfficerSelf) {
+        state.supervisorSign = '-';
+        state.supervisorName = '';
+        state.supervisorRole = '';
+      } else {
+        state.supervisorSign = '';
+        state.supervisorName = 'นางอรอนงค์ สูญกลาง';
+        state.supervisorRole = 'เกษตรอำเภอสีดา';
+      }
+      ['supervisorSign', 'supervisorName', 'supervisorRole'].forEach(k => {
+        const paperEl = document.querySelector(`[data-field="${k}"]`);
+        if (paperEl) {
+          paperEl.textContent = state[k];
+          if (!state[k]) paperEl.innerHTML = '';
+        }
+        const sb = document.querySelector(`[data-bind="${k}"]`);
+        if (sb) sb.value = state[k];
+      });
+      saveState();
+    }
+
+    function maybeAutoSwitchSupervisor() {
+      const nowOfficer = isDistrictAgriOfficer(state.applicantName, state.applicantRole);
+      if (nowOfficer !== lastIsOfficerSelf) {
+        applySupervisorPreset(nowOfficer);
+      }
+    }
+
+    function renderCheckboxIcon(checked) {
+      // Exact box geometry matching Wingdings2 \uf0a3 at 16.08pt + exact diagonal stroke from PDF drawing
+      return `
+        <svg viewBox="0 0 14.33 14.33" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2.1" y="2.0" width="10.2" height="10.2" fill="none" stroke="#000" stroke-width="0.95" />
+          ${checked ? '<line x1="4.2" y1="11.4" x2="15.6" y2="0.0" stroke="#000" stroke-width="1.75" stroke-linecap="butt" />' : ''}
+        </svg>
+      `;
+    }
+
+    function renderCheckboxes() {
+      document.querySelectorAll('.chk-btn').forEach(btn => {
+        const idx = Number(btn.dataset.chk);
+        btn.innerHTML = renderCheckboxIcon(state.vehicleChoice === idx);
+      });
+      document.querySelectorAll('input[name="sbVehicle"]').forEach(r => {
+        r.checked = Number(r.value) === state.vehicleChoice;
+      });
+    }
+
+    function toggleVehicle(idx) {
+      state.vehicleChoice = (state.vehicleChoice === idx) ? 0 : idx;
+      renderCheckboxes();
+      saveState();
+    }
+
+    function setVehicle(idx) {
+      state.vehicleChoice = Number(idx);
+      renderCheckboxes();
+      saveState();
+    }
+
+    function updateIntroUseSpacing() {
+      const introEl = document.querySelector('[data-field="introUse"]');
+      if (!introEl) return;
+      const empty = !introEl.textContent.trim();
+      introEl.classList.toggle('is-empty', empty);
+      if (empty && document.activeElement !== introEl) {
+        introEl.innerHTML = '';
+      }
+    }
+
+    function extractEditableText(el) {
+      let out = '';
+      function walk(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          out += node.nodeValue;
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          const tag = node.tagName;
+          if (tag === 'BR') {
+            out += ' ';
+            return;
+          }
+          const isBlock = tag === 'DIV' || tag === 'P';
+          if (isBlock && out && !out.endsWith(' ')) out += ' ';
+          node.childNodes.forEach(walk);
+          if (isBlock && out && !out.endsWith(' ')) out += ' ';
+        }
+      }
+      walk(el);
+      return out.replace(/\r?\n/g, ' ').replace(/\u00a0/g, ' ').replace(/ {3,}/g, ' ').trim();
+    }
+
+    const DEFAULT_MAIN_PLAIN = (() => {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = DEFAULTS.mainBodyHTML;
+      return tmp.textContent.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+    })();
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/  /g, ' &nbsp;');
+    }
+
+    function countThaiBaseChars(str) {
+      return str.replace(/[\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]/g, '').length;
+    }
+
+    function tokenizeThaiWords(text) {
+      let rawTokens = [];
+      if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+        const seg = new Intl.Segmenter('th', { granularity: 'word' });
+        for (const s of seg.segment(text)) {
+          rawTokens.push(s.segment);
+        }
+      } else {
+        rawTokens = text.split(/(\s+)/);
+      }
+      // Attach trailing punctuation (comma, period, closing paren, ๆ) to previous token,
+      // and keep Thai person-name prefixes (นาย/นาง/นางสาว) joined with the entire name up to the next space.
+      const tokens = [];
+      for (let i = 0; i < rawTokens.length; i++) {
+        const tk = rawTokens[i];
+        if (!tk) continue;
+        if (tokens.length > 0 && /^[,.\)\]\u0E46\u0E2F!?]+$/.test(tk) && !/^\s+$/.test(tokens[tokens.length - 1])) {
+          tokens[tokens.length - 1] += tk;
+        } else if (tokens.length > 0 && /^\s+$/.test(tk) && /^\s+$/.test(tokens[tokens.length - 1])) {
+          tokens[tokens.length - 1] += tk;
+        } else if (/^(นาย|นาง|นางสาว)$/.test(tk)) {
+          let combined = tk;
+          while (i + 1 < rawTokens.length && !/^\s+$/.test(rawTokens[i + 1])) {
+            i++;
+            combined += rawTokens[i];
+          }
+          tokens.push(combined);
+        } else {
+          tokens.push(tk);
+        }
+      }
+      // Merge standalone '(' with following non-space token
+      const merged = [];
+      for (let i = 0; i < tokens.length; i++) {
+        if ((tokens[i] === '(' || tokens[i] === '[') && i + 1 < tokens.length && !/^\s+$/.test(tokens[i + 1])) {
+          merged.push(tokens[i] + tokens[i + 1]);
+          i++;
+        } else {
+          merged.push(tokens[i]);
+        }
+      }
+      return merged;
+    }
+
+    function applyThaiJustify(rawTextOverride) {
+      const paperEl = document.querySelector('[data-field="mainBody"]');
+      if (!paperEl) return;
+
+      const rawText = (typeof rawTextOverride === 'string')
+        ? rawTextOverride.replace(/\r?\n/g, ' ').replace(/\u00a0/g, ' ').replace(/ {3,}/g, ' ').trim()
+        : extractEditableText(paperEl);
+
+      if (!rawText) {
+        state.mainBodyHTML = '';
+        paperEl.innerHTML = '';
+        return;
+      }
+
+      if (rawText.replace(/\s+/g, ' ').trim() === DEFAULT_MAIN_PLAIN) {
+        state.mainBodyHTML = DEFAULTS.mainBodyHTML;
+        if (paperEl.innerHTML !== state.mainBodyHTML) {
+          paperEl.innerHTML = state.mainBodyHTML;
+        }
+        return;
+      }
+
+      const flowEl = paperEl.parentElement;
+      const paraWidthPx = paperEl.getBoundingClientRect().width;
+      if (!paraWidthPx) return;
+      const pxPerPt = paraWidthPx / 454.36;
+      const line1MaxPx = 383.51 * pxPerPt; // 454.36 - 70.85 indent
+      const lineMaxPx = paraWidthPx;
+
+      let measureEl = document.getElementById('tjMeasure');
+      if (!measureEl) {
+        measureEl = document.createElement('span');
+        measureEl.id = 'tjMeasure';
+        measureEl.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font-family:"THSarabunIT9Exact",sans-serif;font-size:16.08pt;line-height:18.106pt;top:0;left:0;pointer-events:none;';
+        flowEl.appendChild(measureEl);
+      }
+
+      const measure = (str, lsPt) => {
+        measureEl.style.letterSpacing = lsPt ? `${lsPt}pt` : '0pt';
+        measureEl.textContent = str;
+        return measureEl.getBoundingClientRect().width;
+      };
+
+      const tokens = tokenizeThaiWords(rawText);
+      const lines = [];
+      let cur = '';
+      let lineIdx = 0;
+
+      for (let i = 0; i < tokens.length; i++) {
+        const tk = tokens[i];
+        const maxPx = (lineIdx === 0) ? line1MaxPx : lineMaxPx;
+
+        if (!cur && /^\s+$/.test(tk)) continue;
+
+        const cand = cur + tk;
+        if (/^\s+$/.test(tk)) {
+          cur = cand;
+          continue;
+        }
+
+        const wPx = measure(cand, 0);
+        if (wPx <= maxPx - 0.5 * pxPerPt) {
+          cur = cand;
+        } else {
+          // Word-style slight-squeeze lookahead (up to ~9pt overflow if base chars allow <= -0.32pt)
+          const overflowPt = (wPx - maxPx) / pxPerPt;
+          const baseChars = Math.max(1, countThaiBaseChars(cand) - 1);
+          const reqLs = -((overflowPt + 0.8) / baseChars);
+          if (cur && overflowPt <= 9.5 && reqLs >= -0.32 && measure(cand, reqLs) <= maxPx - 0.5 * pxPerPt) {
+            cur = cand;
+          } else {
+            if (cur.trim()) {
+              lines.push(cur.replace(/\s+$/, ''));
+              lineIdx++;
+              cur = tk.replace(/^\s+/, '');
+            } else {
+              // Single token wider than entire line: force put
+              cur = cand;
+            }
+          }
+        }
+      }
+      if (cur.trim()) {
+        lines.push(cur.replace(/\s+$/, ''));
+      }
+
+      const htmlParts = lines.map((lineText, idx) => {
+        const isLast = (idx === lines.length - 1);
+        if (isLast) {
+          return `<span style="letter-spacing:0pt">${escapeHtml(lineText)}</span>`;
+        }
+        const maxPx = (idx === 0) ? line1MaxPx : lineMaxPx;
+        const natPx = measure(lineText, 0);
+        const gapPt = (maxPx - natPx) / pxPerPt;
+        const baseChars = Math.max(2, countThaiBaseChars(lineText) - 1);
+        const spaceCount = (lineText.match(/ /g) || []).length;
+
+        let ls = 0;
+        if (gapPt < 0.8) {
+          ls = (gapPt - 1.0) / baseChars;
+        } else if (spaceCount <= 1) {
+          ls = Math.min(0.95, (gapPt - 0.6) / baseChars);
+        } else {
+          // Fill ~99.8% of the line via Thai Distributed tracking so the next line's first token never pulls up
+          ls = Math.min(0.75, (gapPt - 0.6) / baseChars);
+        }
+
+        // Guard against accidental overflow / wrap of the last word on this line
+        let tries = 0;
+        while (measure(lineText, ls) > maxPx - 0.6 * pxPerPt && tries < 20) {
+          ls -= 0.025;
+          tries++;
+        }
+
+        return `<span style="letter-spacing:${ls.toFixed(3)}pt">${escapeHtml(lineText)}</span>`;
+      });
+
+      state.mainBodyHTML = htmlParts.join(' ');
+      paperEl.innerHTML = state.mainBodyHTML;
+    }
+
+    function justifyMainBodyNow() {
+      applyThaiJustify();
+      const sb = document.querySelector('[data-bind="mainBody"]');
+      const paperEl = document.querySelector('[data-field="mainBody"]');
+      if (sb && paperEl) sb.value = extractEditableText(paperEl);
+      saveState();
+    }
+
+    function syncPaperFromState() {
+      document.querySelectorAll('[data-field]').forEach(el => {
+        const key = el.dataset.field;
+        if (key === 'mainBody') {
+          el.innerHTML = state.mainBodyHTML;
+        } else if (key in state) {
+          el.textContent = state[key];
+        }
+      });
+      updateIntroUseSpacing();
+      renderCheckboxes();
+    }
+
+    function syncSidebarFromState() {
+      document.querySelectorAll('[data-bind]').forEach(inp => {
+        const key = inp.dataset.bind;
+        if (key === 'mainBody') {
+          const tmp = document.createElement('div');
+          tmp.innerHTML = state.mainBodyHTML;
+          inp.value = tmp.textContent;
+        } else if (key in state) {
+          inp.value = state[key];
+        }
+      });
+    }
+
+    function bindEvents() {
+      let sbJustifyTimer = null;
+
+      // Paper -> State -> Sidebar
+      document.querySelectorAll('[data-field]').forEach(el => {
+        el.addEventListener('input', () => {
+          const key = el.dataset.field;
+          if (key === 'mainBody') {
+            state.mainBodyHTML = el.innerHTML;
+          } else {
+            state[key] = el.textContent;
+          }
+          const sb = document.querySelector(`[data-bind="${key}"]`);
+          if (sb && document.activeElement !== sb) {
+            sb.value = (key === 'mainBody') ? extractEditableText(el) : el.textContent;
+          }
+          if (key === 'introUse') {
+            updateIntroUseSpacing();
+          }
+          if (key === 'applicantName' || key === 'applicantRole') {
+            maybeAutoSwitchSupervisor();
+          }
+          saveState();
+        });
+
+        if (el.dataset.field === 'mainBody') {
+          el.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const txt = (e.clipboardData || window.clipboardData).getData('text/plain').replace(/\r?\n/g, ' ');
+            document.execCommand('insertText', false, txt);
+          });
+          el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              el.blur();
+            }
+          });
+          el.addEventListener('blur', () => {
+            applyThaiJustify();
+            const sb = document.querySelector('[data-bind="mainBody"]');
+            if (sb) sb.value = extractEditableText(el);
+            saveState();
+          });
+        }
+
+        if (el.dataset.field === 'introUse') {
+          el.addEventListener('blur', updateIntroUseSpacing);
+        }
+
+        if (el.dataset.field === 'supervisorName' || el.dataset.field === 'supervisorSign') {
+          el.addEventListener('blur', () => {
+            if (!el.textContent.trim()) {
+              el.innerHTML = '';
+              state[el.dataset.field] = '';
+              saveState();
+            }
+          });
+        }
+
+        // Prevent accidental newlines inside single-line editable fields
+        if (el.dataset.field !== 'mainBody') {
+          el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              el.blur();
+            }
+          });
+        }
+      });
+
+      // Sidebar -> State -> Paper
+      document.querySelectorAll('[data-bind]').forEach(inp => {
+        inp.addEventListener('input', () => {
+          const key = inp.dataset.bind;
+          const paperEl = document.querySelector(`[data-field="${key}"]`);
+          if (key === 'mainBody') {
+            const cleanText = inp.value.replace(/\r?\n/g, ' ');
+            state.mainBodyHTML = escapeHtml(cleanText);
+            if (paperEl) paperEl.innerHTML = state.mainBodyHTML;
+            clearTimeout(sbJustifyTimer);
+            sbJustifyTimer = setTimeout(() => {
+              applyThaiJustify(cleanText);
+              saveState();
+            }, 100);
+          } else {
+            state[key] = inp.value;
+            if (paperEl) {
+              paperEl.textContent = inp.value;
+              if (!inp.value && (key === 'supervisorName' || key === 'supervisorSign')) paperEl.innerHTML = '';
+            }
+            if (key === 'introUse') updateIntroUseSpacing();
+            if (key === 'applicantName' || key === 'applicantRole') {
+              maybeAutoSwitchSupervisor();
+            }
+          }
+          saveState();
+        });
+      });
+
+      window.addEventListener('beforeprint', () => {
+        applyThaiJustify();
+      });
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state = { ...DEFAULTS, ...parsed };
+          lastIsOfficerSelf = isDistrictAgriOfficer(state.applicantName, state.applicantRole);
+          // Migrate drafts saved before supervisorRole existed when applicant is not the District Agri Officer
+          if (!('supervisorRole' in parsed) && !lastIsOfficerSelf && state.supervisorSign === '-' && !state.supervisorName) {
+            state.supervisorSign = '';
+            state.supervisorName = 'นางอรอนงค์ สูญกลาง';
+            state.supervisorRole = 'เกษตรอำเภอสีดา';
+          }
+        } else {
+          lastIsOfficerSelf = isDistrictAgriOfficer(state.applicantName, state.applicantRole);
+        }
+      } catch (e) {
+        state = { ...DEFAULTS };
+        lastIsOfficerSelf = true;
+      }
+    }
+
+    function resetDefaults() {
+      state = { ...DEFAULTS };
+      lastIsOfficerSelf = true;
+      localStorage.removeItem(STORAGE_KEY);
+      syncPaperFromState();
+      syncSidebarFromState();
+    }
+
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      const btn = document.getElementById('btnToggleSidebar');
+      sb.classList.toggle('hidden');
+      btn.classList.toggle('active', !sb.classList.contains('hidden'));
+    }
+
+    function toggleHighlights() {
+      document.body.classList.toggle('show-highlights');
+      const btn = document.getElementById('btnToggleHighlight');
+      btn.classList.toggle('active', document.body.classList.contains('show-highlights'));
+    }
+
+    function setOverlayOpacity(val) {
+      document.getElementById('refOverlay').style.opacity = (Number(val) / 100).toFixed(2);
+      document.getElementById('overlayPct').textContent = val + '%';
+    }
+
+    function exportJson() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `บันทึกขออนุมัติไปราชการ_${(state.docno || 'form').replace(/[\\/:*?"<>|]/g, '-')}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJson(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          state = { ...DEFAULTS, ...parsed };
+          lastIsOfficerSelf = isDistrictAgriOfficer(state.applicantName, state.applicantRole);
+          syncPaperFromState();
+          runInitialJustify();
+          syncSidebarFromState();
+          saveState();
+        } catch (err) {
+          alert('ไฟล์ JSON ไม่ถูกต้อง');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    loadState();
+    syncPaperFromState();
+    syncSidebarFromState();
+    bindEvents();
+
+    const runInitialJustify = () => {
+      const paperEl = document.querySelector('[data-field="mainBody"]');
+      if (!paperEl) return;
+      const curText = extractEditableText(paperEl).replace(/\s+/g, ' ').trim();
+      if (curText !== DEFAULT_MAIN_PLAIN) {
+        applyThaiJustify();
+        const sb = document.querySelector('[data-bind="mainBody"]');
+        if (sb) sb.value = extractEditableText(paperEl);
+        saveState();
+      }
+    };
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(runInitialJustify);
+    } else {
+      window.addEventListener('load', runInitialJustify);
+    }
+  </script>
+</body>
+</html>
